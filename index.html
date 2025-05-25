@@ -1,11 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>My Web Page</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>動く円の追いかけっこ</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #111;
+    height: 100vh;
+  }
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+</style>
 </head>
 <body>
-  <h1>ようこそ！</h1>
-  <p>これはGitHub Pagesを使ったサンプルです。</p>
+
+<script>
+  const colors = ['#ff4c4c', '#4cff4c', '#4c4cff', '#ffff4c', '#ff4cff', '#4cffff'];
+  const circles = [];
+
+  // 円を作る関数
+  function createCircle(x, y, color, size) {
+    const circle = document.createElement('div');
+    circle.className = 'circle';
+    circle.style.width = size + 'px';
+    circle.style.height = size + 'px';
+    circle.style.background = color;
+    circle.style.left = x + 'px';
+    circle.style.top = y + 'px';
+    document.body.appendChild(circle);
+    return circle;
+  }
+
+  // 10個の円を用意
+  for (let i = 0; i < 10; i++) {
+    const size = 30 + Math.random() * 40;
+    const color = colors[i % colors.length];
+    const circle = createCircle(window.innerWidth / 2, window.innerHeight / 2, color, size);
+    circles.push({el: circle, x: window.innerWidth / 2, y: window.innerHeight / 2});
+  }
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+
+  // マウスの位置を取得
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  // アニメーション
+  function animate() {
+    let targetX = mouseX;
+    let targetY = mouseY;
+
+    circles.forEach((circle, i) => {
+      circle.x += (targetX - circle.x) * 0.2;
+      circle.y += (targetY - circle.y) * 0.2;
+
+      circle.el.style.left = circle.x + 'px';
+      circle.el.style.top = circle.y + 'px';
+
+      // 次の円のターゲットは今の円の位置にする（チェイン効果）
+      targetX = circle.x;
+      targetY = circle.y;
+    });
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // ウィンドウリサイズ時に中央をリセット
+  window.addEventListener('resize', () => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    circles.forEach(circle => {
+      circle.x = centerX;
+      circle.y = centerY;
+      circle.el.style.left = centerX + 'px';
+      circle.el.style.top = centerY + 'px';
+    });
+  });
+</script>
+
 </body>
 </html>
